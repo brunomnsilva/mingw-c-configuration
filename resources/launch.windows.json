@@ -1,5 +1,5 @@
 {
-    "name": "gdb - Debug project (MinGW)",
+    "name": "Debug project (MinGW)",
     "type": "cppdbg",
     "request": "launch",
     "program": "${workspaceFolder}\\prog.exe", 
@@ -16,6 +16,7 @@
             "ignoreFailures": true
         }
     ],
+    "preLaunchTask": "Make debug (MinGW)",
     "miDebuggerPath": "{{gdbPath}}"            
 }
   

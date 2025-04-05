@@ -122,9 +122,22 @@ async function injectTasksConfigurationIntoWorkspace(context, replacements) {
     const config = vscode.workspace.getConfiguration('tasks', workspaceFolder.uri);
     const currentConfigs = config.get('tasks') || [];
 
-    currentConfigs.push(updatedTasks);
+    const alreadyExists = currentConfigs.some(conf => conf.label === updatedTasks.label);
 
-    await config.update('tasks', currentConfigs, vscode.ConfigurationTarget.Workspace);
+    if (alreadyExists) {
+        // Replace our configuration if it already exists
+        const updatedConfigs = [
+            ...currentConfigs.filter(conf => conf.name !== updatedTasks.name),
+            updatedTasks
+        ];
+        await config.update('tasks', updatedConfigs, vscode.ConfigurationTarget.Workspace);
+        vscode.window.showInformationMessage(`Updated tasks.json.`);        
+    } else {
+        // Push our configuration
+        currentConfigs.push(updatedTasks);
+        await config.update('tasks', currentConfigs, vscode.ConfigurationTarget.Workspace);
+        vscode.window.showInformationMessage(`Created tasks.json.`);
+    }
 }
 
 /**
@@ -152,11 +165,24 @@ async function injectLaunchConfigurationIntoWorkspace(context, replacements) {
     const updatedLaunch = replacePlaceholders(launchData, replacements);
 
     const config = vscode.workspace.getConfiguration('launch', workspaceFolder.uri);
-    const currentConfigs = config.get('configurations') || [];
+    const currentConfigs = config.get('configurations') || []; 
 
-    currentConfigs.push(updatedLaunch);
+    const alreadyExists = currentConfigs.some(conf => conf.name === updatedLaunch.name);
 
-    await config.update('configurations', currentConfigs, vscode.ConfigurationTarget.Workspace);
+    if (alreadyExists) {
+        // Replace our configuration if it already exists
+        const updatedConfigs = [
+            ...currentConfigs.filter(conf => conf.name !== updatedLaunch.name),
+            updatedLaunch
+        ];
+        await config.update('configurations', updatedConfigs, vscode.ConfigurationTarget.Workspace);
+        vscode.window.showInformationMessage(`Updated launch.json.`);        
+    } else {
+        // Push our configuration
+        currentConfigs.push(updatedLaunch);
+        await config.update('configurations', currentConfigs, vscode.ConfigurationTarget.Workspace);
+        vscode.window.showInformationMessage(`Created launch.json.`);
+    }
 }
 
 /**
@@ -183,6 +209,8 @@ async function injectSettingsIntoWorkspace(context, replacements) {
         const config = vscode.workspace.getConfiguration(section);
         await config.update(key.substring(section.length + 1), value, vscode.ConfigurationTarget.Workspace);
     }
+    
+    vscode.window.showInformationMessage(`Updated settings.json.`);
 }
 
 
@@ -192,7 +220,7 @@ async function injectSettingsIntoWorkspace(context, replacements) {
  * Replaces placeholders in the given JSON configuration object with the provided values.
  * @param {any} jsonObj 
  * @param {Record<string, string>} replacements 
- * @returns 
+ * @returns {object}
  */
 function replacePlaceholders(jsonObj, replacements) {
     const jsonStr = JSON.stringify(jsonObj);
