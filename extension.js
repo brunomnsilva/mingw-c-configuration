@@ -58,12 +58,15 @@ function activate(context) {
         console.log(`Gdb Path: ${gdbPath}`);
         console.log(`Make Path: ${makePath}`);
 
-        const settingsReplacements = {
+        const replacements = {
             "executablesPath" : executablesPath,
-            "makePath" : makePath
+            "makePath" : makePath,
+            "gdbPath" : gdbPath,
+            "gccPath" : gccPath
         };
 
-        injectSettingsIntoWorkspace(context, settingsReplacements);
+        injectSettingsIntoWorkspace(context, replacements);
+        injectLaunchConfigurationIntoWorkspace(context, replacements);
         
         // Display a success message box to the user
         vscode.window.showInformationMessage('MinGW Configuration Complete!');
@@ -82,20 +85,41 @@ function deactivate() {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Extension Logic
 
+
+async function injectLaunchConfigurationIntoWorkspace(context, replacements) {
+    let launchFile = 'launch.windows.json'
+
+    const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
+    if (!workspaceFolder) {
+        vscode.window.showErrorMessage('No workspace folder found.');
+        return;
+    }
+
+    const launchPath = path.join(context.extensionPath, 'resources', launchFile);
+    const launchData = JSON.parse(fs.readFileSync(launchPath, 'utf8'));
+    const updatedLaunch = replacePlaceholders(launchData, replacements);
+
+    const config = vscode.workspace.getConfiguration('launch', workspaceFolder.uri);
+    const currentConfigs = config.get('configurations') || [];
+
+    currentConfigs.push(updatedLaunch);
+
+    await config.update('configurations', currentConfigs, vscode.ConfigurationTarget.Workspace);
+}
+
 /**
  * 
  * @param {vscode.ExtensionContext} context 
  */
 async function injectSettingsIntoWorkspace(context, replacements) {
-    let configFile = 'settings.windows.json';
+    let settingsFile = 'settings.windows.json';
 
-    const configPath = path.join(context.extensionPath, 'resources', configFile);
-    const configData = JSON.parse(fs.readFileSync(configPath, 'utf8'));
-
-    const updatedConfig = replacePlaceholders(configData, replacements);
+    const settingsPath = path.join(context.extensionPath, 'resources', settingsFile);
+    const settingsData = JSON.parse(fs.readFileSync(settingsPath, 'utf8'));
+    const updatedSettings = replacePlaceholders(settingsData, replacements);
 
     // Inject the updated config into VS Code settings
-    for (const [key, value] of Object.entries(updatedConfig)) {
+    for (const [key, value] of Object.entries(updatedSettings)) {
         const section = key.split('.')[0];
         const config = vscode.workspace.getConfiguration(section);
         await config.update(key.substring(section.length + 1), value, vscode.ConfigurationTarget.Workspace);

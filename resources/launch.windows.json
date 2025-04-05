@@ -1,0 +1,21 @@
+{
+    "name": "gdb - Debug project (MinGW)",
+    "type": "cppdbg",
+    "request": "launch",
+    "program": "${workspaceFolder}\\prog.exe", 
+    "args": [],
+    "stopAtEntry": false,
+    "cwd": "${workspaceFolder}",
+    "environment": [],
+    "MIMode": "gdb",
+    "externalConsole": false,
+    "setupCommands": [
+        {
+            "description": "Enable pretty-printing for gdb",
+            "text": "-enable-pretty-printing",
+            "ignoreFailures": true
+        }
+    ],
+    "miDebuggerPath": "{{gdbPath}}"            
+}
+  
