@@ -20,8 +20,7 @@ function activate(context) {
     let disposable = vscode.commands.registerCommand(CONFIGURE_C_COMMAND_ID, async () => {
         
         // Ensure a workspace is open
-        if (!vscode.workspace.workspaceFolders || vscode.workspace.workspaceFolders.length === 0) {
-            vscode.window.showErrorMessage('No workspace folder open. Please open a folder to use this command.');
+        if (!ensureWorkspaceOpen()) {
             return;
         }
 
@@ -42,7 +41,21 @@ function deactivate() {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Extension Logic
 
-// TODO
+
+// -- Auxiliary function
+
+/**
+ * Checks if a workspace is open in the editor.
+ * @returns {boolean} True if a workspace is open; false, otherwise.
+ */
+function ensureWorkspaceOpen() {
+    if (!vscode.workspace.workspaceFolders || vscode.workspace.workspaceFolders.length === 0) {
+        vscode.window.showErrorMessage('No workspace folder open. Please open a folder to use this command.');
+        return false;
+    }
+
+    return true;
+}
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Export activate and deactivate functions for VS Code
