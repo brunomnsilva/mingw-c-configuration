@@ -1,5 +1,6 @@
 const vscode = require('vscode');
 const path = require('path'); 
+const fs = require('fs');
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Constants
@@ -48,6 +49,7 @@ function activate(context) {
         const gdbUri = appendPathToURI(executablesUri, getGdbPath());
         const makeUri = appendPathToURI(executablesUri, getMakePath());
 
+        const executablesPath = executablesUri.fsPath;
         const gccPath = gccUri.fsPath; 
         const gdbPath = gdbUri.fsPath;
         const makePath = makeUri.fsPath;
@@ -55,6 +57,13 @@ function activate(context) {
         console.log(`Gcc Path: ${gccPath}`);
         console.log(`Gdb Path: ${gdbPath}`);
         console.log(`Make Path: ${makePath}`);
+
+        const settingsReplacements = {
+            "executablesPath" : executablesPath,
+            "makePath" : makePath
+        };
+
+        injectSettingsIntoWorkspace(context, settingsReplacements);
         
         // Display a success message box to the user
         vscode.window.showInformationMessage('MinGW Configuration Complete!');
@@ -73,8 +82,26 @@ function deactivate() {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Extension Logic
 
+/**
+ * 
+ * @param {vscode.ExtensionContext} context 
+ */
+async function injectSettingsIntoWorkspace(context, replacements) {
+    let configFile = 'settings.windows.json';
 
-// -- Auxiliary functions
+    const configPath = path.join(context.extensionPath, 'resources', configFile);
+    const configData = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+
+    const updatedConfig = replacePlaceholders(configData, replacements);
+
+    // Inject the updated config into VS Code settings
+    for (const [key, value] of Object.entries(updatedConfig)) {
+        const section = key.split('.')[0];
+        const config = vscode.workspace.getConfiguration(section);
+        await config.update(key.substring(section.length + 1), value, vscode.ConfigurationTarget.Workspace);
+    }
+}
+
 
 function getExecutablesPath() {
     return 'bin';
@@ -90,6 +117,26 @@ function getGdbPath() {
 
 function getMakePath() {
     return 'mingw32-make.exe';
+}
+
+// -- Auxiliary functions
+
+/**
+ * 
+ * @param {any} jsonObj 
+ * @param {Record<string, string>} replacements 
+ * @returns 
+ */
+function replacePlaceholders(jsonObj, replacements) {
+    const jsonStr = JSON.stringify(jsonObj);
+    let updatedStr = jsonStr;
+
+    for (const [key, value] of Object.entries(replacements)) {
+        const placeholder = `{{${key}}}`;
+        updatedStr = updatedStr.replace(new RegExp(placeholder, 'g'), value);
+    }
+
+    return JSON.parse(updatedStr);
 }
 
 /**

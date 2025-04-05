@@ -1,0 +1,17 @@
+{
+    "terminal.integrated.profiles.windows": {        
+        "PowerShell (MinGW)": {
+            "path": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+            "args": [
+                "-NoExit",
+                "-Command",
+                "& {",
+                "    $env:Path = \"{{executablesPath}};$env:Path\";",
+                "    Set-Alias -Name make -Value {{makePath}} -Scope Global;",
+                "    Write-Output \"Using MinGW binaries from {{executablesPath}}\"",
+                "}"
+            ]
+        }
+    },
+    "terminal.integrated.defaultProfile.windows": "PowerShell (MinGW)"
+}
