@@ -17,9 +17,6 @@
       "title": "Create or Update MinGW Configuration for C Language"
     }]
   },
-  "files": [
-    "resources"
-  ],
   "scripts": {
     "lint": "eslint .",
     "pretest": "npm run lint",
