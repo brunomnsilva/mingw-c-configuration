@@ -7,6 +7,15 @@ const fs = require('fs');
 
 const CONFIGURE_C_COMMAND_ID = 'mingw-c-configuration.configure-c';
 
+const EXECUTABLES_PATH = 'bin';
+const GCC_EXEC = 'gcc.exe';
+const GDB_EXEC = 'gdb.exe';
+const MAKE_EXEC = 'mingw32-make.exe';
+
+const TEMPLATE_SETTINGS_JSON = 'settings.windows.json'
+const TEMPLATE_LAUNCH_JSON = 'launch.windows.json'
+const TEMPLATE_TASKS_JSON = 'tasks.windows.json'
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 // De/Activation Functions 
 
@@ -44,10 +53,10 @@ function activate(context) {
         const installationUri = folderUriArr[0];
 
         // Generate paths to binaries
-        const executablesUri = appendPathToURI(installationUri, getExecutablesPath());
-        const gccUri = appendPathToURI(executablesUri, getGccPath());
-        const gdbUri = appendPathToURI(executablesUri, getGdbPath());
-        const makeUri = appendPathToURI(executablesUri, getMakePath());
+        const executablesUri = appendPathToURI(installationUri, EXECUTABLES_PATH);
+        const gccUri = appendPathToURI(executablesUri, GCC_EXEC);
+        const gdbUri = appendPathToURI(executablesUri, GDB_EXEC);
+        const makeUri = appendPathToURI(executablesUri, MAKE_EXEC);
 
         const executablesPath = executablesUri.fsPath;
         const gccPath = gccUri.fsPath; 
@@ -98,7 +107,7 @@ function deactivate() {
  * @param {Object} replacements - An object containing placeholder replacements for the template.
  */
 async function injectTasksConfigurationIntoWorkspace(context, replacements) {
-    let tasksFile = 'tasks.windows.json'
+    let tasksFile = TEMPLATE_TASKS_JSON;
 
     const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
     if (!workspaceFolder) {
@@ -130,7 +139,7 @@ async function injectTasksConfigurationIntoWorkspace(context, replacements) {
  * @param {Object} replacements - An object containing placeholder replacements for the template.
  */
 async function injectLaunchConfigurationIntoWorkspace(context, replacements) {
-    let launchFile = 'launch.windows.json'
+    let launchFile = TEMPLATE_LAUNCH_JSON;
 
     const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
     if (!workspaceFolder) {
@@ -162,7 +171,7 @@ async function injectLaunchConfigurationIntoWorkspace(context, replacements) {
  * @param {Object} replacements - An object containing placeholder replacements for various settings.
  */
 async function injectSettingsIntoWorkspace(context, replacements) {
-    let settingsFile = 'settings.windows.json';
+    let settingsFile = TEMPLATE_SETTINGS_JSON;
 
     const settingsPath = path.join(context.extensionPath, 'resources', settingsFile);
     const settingsData = JSON.parse(fs.readFileSync(settingsPath, 'utf8'));
@@ -176,22 +185,6 @@ async function injectSettingsIntoWorkspace(context, replacements) {
     }
 }
 
-
-function getExecutablesPath() {
-    return 'bin';
-}
-
-function getGccPath() {
-    return 'gcc.exe';
-}
-
-function getGdbPath() {
-    return 'gdb.exe';
-}
-
-function getMakePath() {
-    return 'mingw32-make.exe';
-}
 
 // -- Auxiliary functions
 
