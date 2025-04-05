@@ -41,10 +41,16 @@ function activate(context) {
         }
 
         const selectedFolderUri = folderUriArr[0];
-        const selectedFolderPath = selectedFolderUri.fsPath; 
 
-        console.log(`Folder URI: ${selectedFolderUri}`);
-        console.log(`Folder Path: ${selectedFolderPath}`);
+        // Generate paths to binaries
+        const gccUri = appendPathToURI(selectedFolderUri, getGccPath());
+        const gdbUri = appendPathToURI(selectedFolderUri, getGdbPath());
+
+        const gccPath = gccUri.fsPath; 
+        const gdbPath = gdbUri.fsPath;
+
+        console.log(`Gcc Path: ${gccPath}`);
+        console.log(`Gdb Path: ${gdbPath}`);
         
         // Display a success message box to the user
         vscode.window.showInformationMessage('MinGW Configuration Complete!');
@@ -65,6 +71,26 @@ function deactivate() {
 
 
 // -- Auxiliary functions
+
+function getGccPath() {
+    return 'bin/gcc.exe';
+}
+
+function getGdbPath() {
+    return 'bin/gdb.exe';
+}
+
+/**
+ * @param {vscode.Uri} originalUri
+ * @param {any} subpath
+ */
+function appendPathToURI(originalUri, subpath) {
+    return originalUri.with({
+        path: originalUri.path.endsWith('/') 
+            ? `${originalUri.path}${subpath}`  
+            : `${originalUri.path}/${subpath}`  
+        });
+}
 
 /**
  * Checks if a workspace is open in the editor.
