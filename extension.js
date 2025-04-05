@@ -1,4 +1,5 @@
 const vscode = require('vscode');
+const path = require('path'); 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Constants
@@ -24,8 +25,29 @@ function activate(context) {
             return;
         }
 
-        // Display a message box to the user
-        vscode.window.showInformationMessage('Hello World from MinGW C Configuration!');
+        // Prompt the user for the installation folder
+        const options = {
+            canSelectMany: false,
+            openLabel: 'Select MinGW Installation Folder',
+            canSelectFiles: false,
+            canSelectFolders: true
+        };
+
+        const folderUriArr = await vscode.window.showOpenDialog(options);
+
+        if (!folderUriArr || folderUriArr.length === 0) {
+            vscode.window.showInformationMessage('No folder selected. MinGW configuration cancelled.');
+            return; // User cancelled
+        }
+
+        const selectedFolderUri = folderUriArr[0];
+        const selectedFolderPath = selectedFolderUri.fsPath; 
+
+        console.log(`Folder URI: ${selectedFolderUri}`);
+        console.log(`Folder Path: ${selectedFolderPath}`);
+        
+        // Display a success message box to the user
+        vscode.window.showInformationMessage('MinGW Configuration Complete!');
     });
 
     context.subscriptions.push(disposable);
@@ -42,7 +64,7 @@ function deactivate() {
 // Extension Logic
 
 
-// -- Auxiliary function
+// -- Auxiliary functions
 
 /**
  * Checks if a workspace is open in the editor.
