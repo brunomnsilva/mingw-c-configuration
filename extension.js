@@ -66,6 +66,7 @@ function activate(context) {
         };
 
         injectSettingsIntoWorkspace(context, replacements);
+        injectTasksConfigurationIntoWorkspace(context, replacements);
         injectLaunchConfigurationIntoWorkspace(context, replacements);
         
         // Display a success message box to the user
@@ -85,6 +86,26 @@ function deactivate() {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Extension Logic
 
+async function injectTasksConfigurationIntoWorkspace(context, replacements) {
+    let tasksFile = 'tasks.windows.json'
+
+    const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
+    if (!workspaceFolder) {
+        vscode.window.showErrorMessage('No workspace folder found.');
+        return;
+    }
+
+    const tasksPath = path.join(context.extensionPath, 'resources', tasksFile);
+    const tasksData = JSON.parse(fs.readFileSync(tasksPath, 'utf8'));
+    const updatedTasks = replacePlaceholders(tasksData, replacements);
+
+    const config = vscode.workspace.getConfiguration('tasks', workspaceFolder.uri);
+    const currentConfigs = config.get('tasks') || [];
+
+    currentConfigs.push(updatedTasks);
+
+    await config.update('tasks', currentConfigs, vscode.ConfigurationTarget.Workspace);
+}
 
 async function injectLaunchConfigurationIntoWorkspace(context, replacements) {
     let launchFile = 'launch.windows.json'
