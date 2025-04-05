@@ -40,17 +40,21 @@ function activate(context) {
             return; // User cancelled
         }
 
-        const selectedFolderUri = folderUriArr[0];
+        const installationUri = folderUriArr[0];
 
         // Generate paths to binaries
-        const gccUri = appendPathToURI(selectedFolderUri, getGccPath());
-        const gdbUri = appendPathToURI(selectedFolderUri, getGdbPath());
+        const executablesUri = appendPathToURI(installationUri, getExecutablesPath());
+        const gccUri = appendPathToURI(executablesUri, getGccPath());
+        const gdbUri = appendPathToURI(executablesUri, getGdbPath());
+        const makeUri = appendPathToURI(executablesUri, getMakePath());
 
         const gccPath = gccUri.fsPath; 
         const gdbPath = gdbUri.fsPath;
+        const makePath = makeUri.fsPath;
 
         console.log(`Gcc Path: ${gccPath}`);
         console.log(`Gdb Path: ${gdbPath}`);
+        console.log(`Make Path: ${makePath}`);
         
         // Display a success message box to the user
         vscode.window.showInformationMessage('MinGW Configuration Complete!');
@@ -72,12 +76,20 @@ function deactivate() {
 
 // -- Auxiliary functions
 
+function getExecutablesPath() {
+    return 'bin';
+}
+
 function getGccPath() {
-    return 'bin/gcc.exe';
+    return 'gcc.exe';
 }
 
 function getGdbPath() {
-    return 'bin/gdb.exe';
+    return 'gdb.exe';
+}
+
+function getMakePath() {
+    return 'mingw32-make.exe';
 }
 
 /**
