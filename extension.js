@@ -86,6 +86,17 @@ function deactivate() {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Extension Logic
 
+/**
+ * Injects updated tasks.json contents into the workspace settings by replacing placeholders 
+ * with the provided values.
+ * 
+ * This function reads a settings JSON file (`tasks.windows.json`), replaces 
+ * placeholders with values from the `replacements` object, and updates the 
+ * corresponding VS Code tasks.json contents for the current workspace.
+ * 
+ * @param {vscode.ExtensionContext} context - The extension context, used to access the extension's path.
+ * @param {Object} replacements - An object containing placeholder replacements for the template.
+ */
 async function injectTasksConfigurationIntoWorkspace(context, replacements) {
     let tasksFile = 'tasks.windows.json'
 
@@ -107,6 +118,17 @@ async function injectTasksConfigurationIntoWorkspace(context, replacements) {
     await config.update('tasks', currentConfigs, vscode.ConfigurationTarget.Workspace);
 }
 
+/**
+ * Injects updated launch.json contents into the workspace settings by replacing placeholders 
+ * with the provided values.
+ * 
+ * This function reads a settings JSON file (`launch.windows.json`), replaces 
+ * placeholders with values from the `replacements` object, and updates the 
+ * corresponding VS Code launch.json contents for the current workspace.
+ * 
+ * @param {vscode.ExtensionContext} context - The extension context, used to access the extension's path.
+ * @param {Object} replacements - An object containing placeholder replacements for the template.
+ */
 async function injectLaunchConfigurationIntoWorkspace(context, replacements) {
     let launchFile = 'launch.windows.json'
 
@@ -129,8 +151,15 @@ async function injectLaunchConfigurationIntoWorkspace(context, replacements) {
 }
 
 /**
+ * Injects updated settings into the workspace settings by replacing placeholders 
+ * with the provided values.
  * 
- * @param {vscode.ExtensionContext} context 
+ * This function reads a settings JSON file (`settings.windows.json`), replaces 
+ * placeholders with values from the `replacements` object, and updates the 
+ * corresponding VS Code settings for the current workspace.
+ * 
+ * @param {vscode.ExtensionContext} context - The extension context, used to access the extension's path.
+ * @param {Object} replacements - An object containing placeholder replacements for various settings.
  */
 async function injectSettingsIntoWorkspace(context, replacements) {
     let settingsFile = 'settings.windows.json';
@@ -167,7 +196,7 @@ function getMakePath() {
 // -- Auxiliary functions
 
 /**
- * 
+ * Replaces placeholders in the given JSON configuration object with the provided values.
  * @param {any} jsonObj 
  * @param {Record<string, string>} replacements 
  * @returns 
@@ -185,6 +214,7 @@ function replacePlaceholders(jsonObj, replacements) {
 }
 
 /**
+ * Appends a subpath to a given Uri.
  * @param {vscode.Uri} originalUri
  * @param {any} subpath
  */
