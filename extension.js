@@ -8,14 +8,19 @@ const url = require('url')
 
 const CONFIGURE_C_COMMAND_ID = 'mingw-c-configuration.configure-c';
 
-const EXECUTABLES_PATH = 'bin';
-const GCC_EXEC = 'gcc.exe';
-const GDB_EXEC = 'gdb.exe';
-const MAKE_EXEC = 'mingw32-make.exe';
+const PATH_EXECUTABLES = 'bin';
+const PATH_GCC = 'gcc.exe';
+const PATH_GDB = 'gdb.exe';
+const PATH_MAKE = 'mingw32-make.exe';
 
-const TEMPLATE_SETTINGS_JSON = 'settings.windows.json'
-const TEMPLATE_LAUNCH_JSON = 'launch.windows.json'
-const TEMPLATE_TASKS_JSON = 'tasks.windows.json'
+const TEMPLATE_SETTINGS_JSON = 'settings.windows.json';
+const TEMPLATE_LAUNCH_JSON = 'launch.windows.json';
+const TEMPLATE_TASKS_JSON = 'tasks.windows.json';
+
+const PLACEHOLDER_EXECUTABLES = 'executablesPath';
+const PLACEHOLDER_GCC = 'gccPath';
+const PLACEHOLDER_GDB = 'gdbPath';
+const PLACEHOLDER_MAKE = 'makePath';
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 // De/Activation Functions 
@@ -54,10 +59,10 @@ function activate(context) {
         const installationUri = folderUriArr[0];
 
         // Generate paths to binaries
-        const executablesUri = appendPathToURI(installationUri, EXECUTABLES_PATH);
-        const gccUri = appendPathToURI(executablesUri, GCC_EXEC);
-        const gdbUri = appendPathToURI(executablesUri, GDB_EXEC);
-        const makeUri = appendPathToURI(executablesUri, MAKE_EXEC);
+        const executablesUri = appendPathToURI(installationUri, PATH_EXECUTABLES);
+        const gccUri = appendPathToURI(executablesUri, PATH_GCC);
+        const gdbUri = appendPathToURI(executablesUri, PATH_GDB);
+        const makeUri = appendPathToURI(executablesUri, PATH_MAKE);
 
         const executablesPath = uriToFilepath(executablesUri);
         const gccPath = uriToFilepath(gccUri); 
@@ -69,10 +74,10 @@ function activate(context) {
         console.log(`Make Path: ${makePath}`);
 
         const replacements = {
-            "executablesPath" : executablesPath,
-            "makePath" : makePath,
-            "gdbPath" : gdbPath,
-            "gccPath" : gccPath
+            [PLACEHOLDER_EXECUTABLES] : executablesPath,
+            [PLACEHOLDER_MAKE] : makePath,
+            [PLACEHOLDER_GDB] : gdbPath,
+            [PLACEHOLDER_GCC] : gccPath
         };
 
         injectSettingsIntoWorkspace(context, replacements);
