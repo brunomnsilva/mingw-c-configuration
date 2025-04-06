@@ -1,6 +1,7 @@
 const vscode = require('vscode');
 const path = require('path'); 
 const fs = require('fs');
+const fsPromises = require('fs/promises');
 const url = require('url')
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -16,6 +17,7 @@ const PATH_MAKE = 'mingw32-make.exe';
 const TEMPLATE_SETTINGS_JSON = 'settings.windows.json';
 const TEMPLATE_LAUNCH_JSON = 'launch.windows.json';
 const TEMPLATE_TASKS_JSON = 'tasks.windows.json';
+const TEMPLATE_CPROPERTIES_JSON = 'c_cpp_properties.json';
 
 const PLACEHOLDER_EXECUTABLES = 'executablesPath';
 const PLACEHOLDER_GCC = 'gccPath';
@@ -81,6 +83,7 @@ function activate(context) {
             injectSettingsIntoWorkspace(context, replacements);
             injectTasksConfigurationIntoWorkspace(context, replacements);
             injectLaunchConfigurationIntoWorkspace(context, replacements);
+            injectCPropertiesIntoWorkspace(context, replacements);
             
             // Display a success message box to the user
             vscode.window.showInformationMessage('MinGW configuration completed!');
@@ -215,6 +218,22 @@ async function injectSettingsIntoWorkspace(context, replacements) {
         await config.update(key.substring(section.length + 1), value, vscode.ConfigurationTarget.Workspace);
     }
     
+}
+
+async function injectCPropertiesIntoWorkspace(context, replacements) {
+
+    const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
+    if (!workspaceFolder) {
+        return;
+    }
+
+    const propertiesPath = path.join(context.extensionPath, 'resources', TEMPLATE_CPROPERTIES_JSON);
+    const propertiesData = JSON.parse(fs.readFileSync(propertiesPath, 'utf8'));
+    const updatedSettings = replacePlaceholders(propertiesData, replacements);
+
+    const wsPropertiesPath = path.join(workspaceFolder.uri.fsPath, '.vscode', 'c_cpp_properties.json');
+
+    await fsPromises.writeFile(wsPropertiesPath, JSON.stringify(updatedSettings, null, 4), 'utf-8');
 }
 
 
