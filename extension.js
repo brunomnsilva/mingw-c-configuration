@@ -1,6 +1,7 @@
 const vscode = require('vscode');
 const path = require('path'); 
 const fs = require('fs');
+const url = require('url')
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Constants
@@ -58,10 +59,10 @@ function activate(context) {
         const gdbUri = appendPathToURI(executablesUri, GDB_EXEC);
         const makeUri = appendPathToURI(executablesUri, MAKE_EXEC);
 
-        const executablesPath = executablesUri.fsPath;
-        const gccPath = gccUri.fsPath; 
-        const gdbPath = gdbUri.fsPath;
-        const makePath = makeUri.fsPath;
+        const executablesPath = uriToFilepath(executablesUri);
+        const gccPath = uriToFilepath(gccUri); 
+        const gdbPath = uriToFilepath(gdbUri);
+        const makePath = uriToFilepath(makeUri);
 
         console.log(`Gcc Path: ${gccPath}`);
         console.log(`Gdb Path: ${gdbPath}`);
@@ -215,6 +216,14 @@ async function injectSettingsIntoWorkspace(context, replacements) {
 
 
 // -- Auxiliary functions
+
+/**
+ * Converts an .
+ * @param {vscode.Uri} path
+ */
+function uriToFilepath(path) {
+    return JSON.stringify(url.fileURLToPath(new URL(path))).slice(1, -1);
+}
 
 /**
  * Replaces placeholders in the given JSON configuration object with the provided values.

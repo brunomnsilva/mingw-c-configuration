@@ -6,7 +6,9 @@
         "debug"
     ],
     "options": {
-        
+        "env" : {
+            "PATH" : "{{executablesPath}}:${env:PATH}"
+        }
     },
     "problemMatcher": [
         "$gcc"
