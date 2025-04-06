@@ -32,7 +32,6 @@ const PLACEHOLDER_MAKE = 'makePath';
 function activate(context) {
     
     console.log('Extension "mingw-c-configuration" is now active!');
-
     
     let disposable = vscode.commands.registerCommand(CONFIGURE_C_COMMAND_ID, async () => {
         
@@ -58,7 +57,7 @@ function activate(context) {
 
         const installationUri = folderUriArr[0];
 
-        // Generate paths to binaries
+        // Generate required paths for mingw configuration
         const executablesUri = appendPathToURI(installationUri, PATH_EXECUTABLES);
         const gccUri = appendPathToURI(executablesUri, PATH_GCC);
         const gdbUri = appendPathToURI(executablesUri, PATH_GDB);
@@ -69,9 +68,7 @@ function activate(context) {
         const gdbPath = uriToFilepath(gdbUri);
         const makePath = uriToFilepath(makeUri);
 
-        console.log(`Gcc Path: ${gccPath}`);
-        console.log(`Gdb Path: ${gdbPath}`);
-        console.log(`Make Path: ${makePath}`);
+        console.log(`MinGW C Configuration - Paths: ${executablesPath}; ${gccPath}; ${gdbPath};${makePath}`);
 
         const replacements = {
             [PLACEHOLDER_EXECUTABLES] : executablesPath,
@@ -80,12 +77,18 @@ function activate(context) {
             [PLACEHOLDER_GCC] : gccPath
         };
 
-        injectSettingsIntoWorkspace(context, replacements);
-        injectTasksConfigurationIntoWorkspace(context, replacements);
-        injectLaunchConfigurationIntoWorkspace(context, replacements);
+        try {
+            injectSettingsIntoWorkspace(context, replacements);
+            injectTasksConfigurationIntoWorkspace(context, replacements);
+            injectLaunchConfigurationIntoWorkspace(context, replacements);
+            
+            // Display a success message box to the user
+            vscode.window.showInformationMessage('MinGW configuration completed!');
+        } catch (err) {
+            console.error(err.stack);
+            vscode.window.showErrorMessage('MinGW configuration failed! See extension log.');
+        }
         
-        // Display a success message box to the user
-        vscode.window.showInformationMessage('MinGW Configuration Complete!');
     });
 
     context.subscriptions.push(disposable);
@@ -113,15 +116,13 @@ function deactivate() {
  * @param {Object} replacements - An object containing placeholder replacements for the template.
  */
 async function injectTasksConfigurationIntoWorkspace(context, replacements) {
-    let tasksFile = TEMPLATE_TASKS_JSON;
-
+    
     const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
     if (!workspaceFolder) {
-        vscode.window.showErrorMessage('No workspace folder found.');
         return;
     }
 
-    const tasksPath = path.join(context.extensionPath, 'resources', tasksFile);
+    const tasksPath = path.join(context.extensionPath, 'resources', TEMPLATE_TASKS_JSON);
     const tasksData = JSON.parse(fs.readFileSync(tasksPath, 'utf8'));
     const updatedTasks = replacePlaceholders(tasksData, replacements);
 
@@ -136,13 +137,11 @@ async function injectTasksConfigurationIntoWorkspace(context, replacements) {
             ...currentConfigs.filter(conf => conf.name !== updatedTasks.name),
             updatedTasks
         ];
-        await config.update('tasks', updatedConfigs, vscode.ConfigurationTarget.Workspace);
-        vscode.window.showInformationMessage(`Updated tasks.json.`);        
+        await config.update('tasks', updatedConfigs, vscode.ConfigurationTarget.Workspace);     
     } else {
         // Push our configuration
         currentConfigs.push(updatedTasks);
         await config.update('tasks', currentConfigs, vscode.ConfigurationTarget.Workspace);
-        vscode.window.showInformationMessage(`Created tasks.json.`);
     }
 }
 
@@ -158,15 +157,13 @@ async function injectTasksConfigurationIntoWorkspace(context, replacements) {
  * @param {Object} replacements - An object containing placeholder replacements for the template.
  */
 async function injectLaunchConfigurationIntoWorkspace(context, replacements) {
-    let launchFile = TEMPLATE_LAUNCH_JSON;
-
+    
     const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
     if (!workspaceFolder) {
-        vscode.window.showErrorMessage('No workspace folder found.');
         return;
     }
 
-    const launchPath = path.join(context.extensionPath, 'resources', launchFile);
+    const launchPath = path.join(context.extensionPath, 'resources', TEMPLATE_LAUNCH_JSON);
     const launchData = JSON.parse(fs.readFileSync(launchPath, 'utf8'));
     const updatedLaunch = replacePlaceholders(launchData, replacements);
 
@@ -181,13 +178,11 @@ async function injectLaunchConfigurationIntoWorkspace(context, replacements) {
             ...currentConfigs.filter(conf => conf.name !== updatedLaunch.name),
             updatedLaunch
         ];
-        await config.update('configurations', updatedConfigs, vscode.ConfigurationTarget.Workspace);
-        vscode.window.showInformationMessage(`Updated launch.json.`);        
+        await config.update('configurations', updatedConfigs, vscode.ConfigurationTarget.Workspace);    
     } else {
         // Push our configuration
         currentConfigs.push(updatedLaunch);
         await config.update('configurations', currentConfigs, vscode.ConfigurationTarget.Workspace);
-        vscode.window.showInformationMessage(`Created launch.json.`);
     }
 }
 
@@ -203,9 +198,13 @@ async function injectLaunchConfigurationIntoWorkspace(context, replacements) {
  * @param {Object} replacements - An object containing placeholder replacements for various settings.
  */
 async function injectSettingsIntoWorkspace(context, replacements) {
-    let settingsFile = TEMPLATE_SETTINGS_JSON;
+    
+    const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
+    if (!workspaceFolder) {
+        return;
+    }
 
-    const settingsPath = path.join(context.extensionPath, 'resources', settingsFile);
+    const settingsPath = path.join(context.extensionPath, 'resources', TEMPLATE_SETTINGS_JSON);
     const settingsData = JSON.parse(fs.readFileSync(settingsPath, 'utf8'));
     const updatedSettings = replacePlaceholders(settingsData, replacements);
 
@@ -216,7 +215,6 @@ async function injectSettingsIntoWorkspace(context, replacements) {
         await config.update(key.substring(section.length + 1), value, vscode.ConfigurationTarget.Workspace);
     }
     
-    vscode.window.showInformationMessage(`Updated settings.json.`);
 }
 
 
