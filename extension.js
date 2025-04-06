@@ -57,6 +57,9 @@ function activate(context) {
             return; // User cancelled
         }
 
+        // Make sure .vscode folder exists beforehand, otherwise it is created.
+        await ensureVscodeFolderExists();
+
         const installationUri = folderUriArr[0];
 
         // Generate required paths for mingw configuration
@@ -276,6 +279,18 @@ function appendPathToURI(originalUri, subpath) {
             ? `${originalUri.path}${subpath}`  
             : `${originalUri.path}/${subpath}`  
         });
+}
+
+/**
+ * Ensure the .vscode folder exists in the current workspace
+ */
+async function ensureVscodeFolderExists() {
+    const vscodeFolderPath = path.join(
+        vscode.workspace.workspaceFolders[0].uri.fsPath,
+        '.vscode'
+    );
+
+    await fsPromises.mkdir(vscodeFolderPath, { recursive: true });
 }
 
 /**
