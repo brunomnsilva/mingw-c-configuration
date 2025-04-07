@@ -26,10 +26,9 @@ Its very useful when:
 
 > **Create or Update MinGW Configuration for C Language**
 
- Prompts the user for the MinGW installation folder and then performs the necessary updates to the workspace configuration folders.
+Prompts the user for the MinGW installation folder and then performs the necessary updates to the workspace configuration folders.
 
- (TODO: add animated gif)
-
+![Animated GIF](images/MinGW_C_Configuration_Example.gif)
 
 ### Example `launch.json` Template
 
