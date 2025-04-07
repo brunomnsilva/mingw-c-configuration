@@ -19,6 +19,9 @@
   "categories": [
     "Other", "Programming Languages"
   ],
+  "keywords": [
+    "MinGW", "C Language", "Configuration", "Workspace"
+  ],
   "activationEvents": [],
   "main": "./extension.js",
   "contributes": {
