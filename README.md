@@ -59,18 +59,13 @@ Its very useful when:
 
 where `{{gdbPath}}` is replaced with the `gdb` path of the prompted installation folder.
 
+### Limitations and Known Issues
+
+The `makefile` of your C project should produce an executable called `prog.exe` for the configuration provided by the extension to work without any modification.
+
 ### Extension Settings
 
-None at the moment.
-
-### Known Issues
-
-:warning: The `makefile` of your C project should produce an executable called `prog.exe` for the configuration provided by the extension to work without any modification.
-
-### Release Notes
-
-**0.9.0**  
-- Initial release.
+The extension does not use any settings at the moment.
 
 ### How to Contribute
 
@@ -100,8 +95,8 @@ None at the moment.
 
 ### Author
 
-Bruno Silva (<https://github.com/brunomnsilva>)
+[Bruno Silva](https://github.com/brunomnsilva)
 
 ### License
 
-This extension releases under the **MIT License**.
+This extension releases under the **[MIT License](./LICENSE)**.
