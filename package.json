@@ -3,6 +3,7 @@
   "displayName": "MinGW C Configuration",
   "description": "Creates or Updates a VS Code Workspace Configuration for MinGW",
   "version": "0.9.0",
+  "publisher": "brunomnsilva",
   "icon": "images/MinGW_C_Configuration_Logo_128.png",
   "license": "SEE LICENSE IN LICENSE",
   "bugs": {
