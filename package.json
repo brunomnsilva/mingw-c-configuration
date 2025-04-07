@@ -4,11 +4,20 @@
   "description": "Creates or Updates a VS Code Workspace Configuration for MinGW",
   "version": "0.9.0",
   "icon": "images/MinGW_C_Configuration_Logo_128.png",
+  "license": "SEE LICENSE IN LICENSE",
+  "bugs": {
+    "url": "https://github.com/brunomnsilva/mingw-c-configuration/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/brunomnsilva/mingw-c-configuration.git"
+  },
+  "homepage": "https://github.com/brunomnsilva/mingw-c-configuration.git/blob/main/README.md",
   "engines": {
     "vscode": "^1.8.0"
   },
   "categories": [
-    "Other"
+    "Other", "Programming Languages"
   ],
   "activationEvents": [],
   "main": "./extension.js",
